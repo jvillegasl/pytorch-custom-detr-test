@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from base import BaseModel
 from model.layers import MLP, Backbone, PositionEmbeddingSine
 from model.transformer import Transformer
-from utils.misc import NestedTensor, nested_tensor_from_tensor_list
+from utils.misc import nested_tensor_from_tensor_list
 
 
 class DETR(BaseModel):
@@ -38,18 +38,18 @@ class DETR(BaseModel):
         self.bbox_embed = MLP(self.hidden_dim, self.hidden_dim, 4, 3)
         self.query_embed = nn.Embedding(num_queries, self.hidden_dim)
 
-    def forward(self, input: NestedTensor | list[torch.Tensor] | torch.Tensor):
+    def forward(self, input: tuple[torch.Tensor, torch.Tensor] | list[torch.Tensor] | torch.Tensor):
         if isinstance(input, (list, torch.Tensor)):
             input = nested_tensor_from_tensor_list(input)
 
-        features: NestedTensor = self.backbone(input)
+        features = self.backbone(input)
 
-        src, mask = features.decompose()
+        src, mask = features
         assert mask is not None
+
+        pos = self.position_embedding(features).to(src.dtype)
+
         src = self.conv(src)
-
-        pos = self.position_embedding(features).to(features.tensors.dtype)
-
         hs = self.transformer(src, mask, self.query_embed.weight, pos)[0]
 
         outputs_class = self.class_embed(hs)

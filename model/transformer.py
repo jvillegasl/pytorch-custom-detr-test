@@ -111,7 +111,7 @@ class TransformerDecoder(nn.Module):
 
         if self.return_intermediate:
             return torch.stack(intermediate)
-
+        print('transformer output', output.shape)
         return output.unsqueeze(0)
 
 

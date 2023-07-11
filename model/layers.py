@@ -4,8 +4,6 @@ import torch.nn.functional as F
 from torchvision.models import resnet18, ResNet18_Weights
 import math
 
-from utils.misc import NestedTensor
-
 
 class MLP(nn.Module):
     """ Very simple multi-layer perceptron (also called FFN)"""
@@ -40,9 +38,8 @@ class PositionEmbeddingSine(nn.Module):
             scale = 2 * math.pi
         self.scale = scale
 
-    def forward(self, tensor_list: NestedTensor):
-        x = tensor_list.tensors
-        mask = tensor_list.mask
+    def forward(self, tensor_list: tuple[torch.Tensor, torch.Tensor]):
+        x, mask = tensor_list
         assert mask is not None
         not_mask = ~mask
         y_embed = not_mask.cumsum(1, dtype=torch.float32)
@@ -75,9 +72,8 @@ class Backbone(nn.Module):
         )
         self.num_channels = 512
 
-    def forward(self, tensor_list: NestedTensor):
-        tensors = tensor_list.tensors
-        m = tensor_list.mask
+    def forward(self, tensor_list: tuple[torch.Tensor, torch.Tensor]):
+        tensors, m = tensor_list
         assert m is not None
 
         x = self.body(tensors)
@@ -87,6 +83,4 @@ class Backbone(nn.Module):
         ).to(torch.bool)[0]
         # m[None] equivalent to unsqueeze(0)
 
-        out = NestedTensor(x, mask)
-
-        return out
+        return x, mask
