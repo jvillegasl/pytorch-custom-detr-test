@@ -1,51 +1,54 @@
 {
-    "name": "Mnist_LeNet",
+    "name": "Stars_DETR",
     "n_gpu": 1,
 
     "arch": {
-        "type": "MnistModel",
-        "args": {}
+        "type": "DETR",
+        "args": {
+            "num_classes": 1,
+            "num_queries": 20
+        }
     },
     "data_loader": {
-        "type": "MnistDataLoader",
+        "type": "StarsDataLoader",
         "args": {
-            "data_dir": "data/",
-            "batch_size": 128,
+            "data_dir": "C:/Users/jvill/datasets/simple-object-detection_stars/",
+            "batch_size": 64,
             "shuffle": true,
             "validation_split": 0.1,
-            "num_workers": 2
+            "num_workers": 4
         }
     },
     "optimizer": {
-        "type": "Adam",
+        "type": "AdamW",
         "args": {
-            "lr": 0.001,
-            "weight_decay": 0,
+            "lr": 1e-4,
+            "weight_decay": 1e-4,
             "amsgrad": true
         }
     },
-    "loss": "nll_loss",
-    "metrics": ["accuracy", "top_k_acc"],
+    "loss": "bipartite_matching_loss",
+    "metrics": [],
     "lr_scheduler": {
         "type": "StepLR",
         "args": {
-            "step_size": 50,
+            "step_size": 100,
             "gamma": 0.1
         }
     },
     "trainer": {
-        "epochs": 10,
+        "epochs": 100,
 
         "save_dir": "saved/",
-        "save_period": 1,
+        "save_period": 5,
         "verbosity": 2,
 
         "monitor": "min val_loss",
-        "early_stop": 10,
+        "early_stop": 20,
 
         "tensorboard": true
     },
     "export": {
         "dummy_input_shape": [1, 1, 28, 28]
-    }   
+    }
 }
