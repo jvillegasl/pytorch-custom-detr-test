@@ -74,7 +74,7 @@ class SetCriterion(nn.Module):
 
             targets: List[dict], `len(targets) == batch_size`, each dict contains:
                - "labels": Tensor, shape `[num_objects_i]`
-               - "bboxes": Tensor, shape `[num_objects_i, 4]`
+               - "boxes": Tensor, shape `[num_objects_i, 4]`
 
             indices: List[Tuple[Tensor, Tensor]] where `len(indices) == batch_size` and:
                - indices[i][0]: Indices of the selected predictions (in order)
@@ -89,7 +89,6 @@ class SetCriterion(nn.Module):
         """
 
         pred_logits = outputs['pred_logits']
-        print(pred_logits)
         idx = self._get_src_permutation_idx(indices)
         # Tuple[Tensor[total_num_objects], Tensor[total_num_objects]]
         # Tuple[batch_coords, pred_coords]
@@ -139,7 +138,7 @@ class SetCriterion(nn.Module):
 
             targets: List[dict], `len(targets) == batch_size`, each dict contains:
                - "labels": Tensor, shape `[num_objects_i]`
-               - "bboxes": Tensor, shape `[num_objects_i, 4]`
+               - "boxes": Tensor, shape `[num_objects_i, 4]`
 
         Returns:
             losses: Dict containing:
@@ -185,7 +184,7 @@ class SetCriterion(nn.Module):
 
             targets: List[dict], `len(targets) == batch_size`, each dict contains:
                - "labels": Tensor, shape `[num_objects_i]`
-               - "bboxes": Tensor, shape `[num_objects_i, 4]`
+               - "boxes": Tensor, shape `[num_objects_i, 4]`
 
             indices: List[Tuple[Tensor, Tensor]] where `len(indices) == batch_size` and:
                - indices[i][0]: Indices of the selected predictions (in order)
@@ -211,7 +210,7 @@ class SetCriterion(nn.Module):
         # [total_num_objects, 4]
 
         tgt_bboxes = torch.cat([
-            t['bboxes'][i]  # ordered bboxes, [num_objects_i]
+            t['boxes'][i]  # ordered bboxes, [num_objects_i]
             for t, (_, i) in zip(targets, indices)
         ], dim=0)
         # [total_num_objects, 4]
@@ -243,7 +242,7 @@ class SetCriterion(nn.Module):
 
             targets: List[dict], `len(targets) == batch_size`, each dict contains:
                - "labels": Tensor, shape `[num_objects_i]`
-               - "bboxes": Tensor, shape `[num_objects_i, 4]`
+               - "boxes": Tensor, shape `[num_objects_i, 4]`
         """
 
         indices = self.matcher(outputs, targets)

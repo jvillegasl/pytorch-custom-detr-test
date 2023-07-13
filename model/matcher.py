@@ -29,7 +29,7 @@ class HungarianMatcher(nn.Module):
 
             targets: List[dict], `len(targets) == batch_size`, each dict contains:
                - "labels": Tensor, shape `[num_objects_i]`
-               - "bboxes": Tensor, shape `[num_objects_i, 4]`
+               - "boxes": Tensor, shape `[num_objects_i, 4]`
 
         Returns:
             indices: List[Tuple[Tensor, Tensor]] where `len(indices) == batch_size` and:
@@ -49,7 +49,7 @@ class HungarianMatcher(nn.Module):
 
         tgt_ids = torch.cat([v['labels'] for v in targets])
         # [total_num_objects] where sum(num_objects_i)
-        tgt_bbox = torch.cat([v['bboxes'] for v in targets])
+        tgt_bbox = torch.cat([v['boxes'] for v in targets])
         # [total_num_objects, 4]
 
         # The costs are calculated for all the target objects
@@ -71,7 +71,7 @@ class HungarianMatcher(nn.Module):
         C = C.view(batch_size, num_queries, -1).cpu()
         # [batch_size, num_queries, total_num_objects]
 
-        sizes = [len(v['bboxes']) for v in targets]
+        sizes = [len(v['boxes']) for v in targets]
         # sizes[i] == num_object_i
         # sum(sizes) == total_num_objects
         # len(sizes) == batch_size

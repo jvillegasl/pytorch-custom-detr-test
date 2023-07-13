@@ -9,11 +9,10 @@ from utils.misc import nested_tensor_from_tensor_list
 
 
 class DETR(BaseModel):
-    hidden_dim: int = 128
+    hidden_dim: int = 64
     num_heads: int = 4
     num_encoder_layers: int = 4
     num_decoder_layers: int = 4
-    max_num_objects: int = 64
 
     def __init__(self, num_classes, num_queries):
         super().__init__()
@@ -39,7 +38,7 @@ class DETR(BaseModel):
         self.query_embed = nn.Embedding(num_queries, self.hidden_dim)
 
     def forward(self, input: tuple[torch.Tensor, torch.Tensor] | list[torch.Tensor] | torch.Tensor):
-        if isinstance(input, (list, torch.Tensor)):
+        if not isinstance(input, tuple):
             input = nested_tensor_from_tensor_list(input)
 
         features = self.backbone(input)
