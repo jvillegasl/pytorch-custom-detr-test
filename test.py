@@ -43,7 +43,7 @@ def main(config):
     model.eval()
 
     total_loss = 0.0
-    total_metrics = torch.zeros(len(metric_fns))
+    total_metrics = torch.zeros(len(metric_fns), device=device)
 
     with torch.no_grad():
         for i, (data, target) in enumerate(tqdm(data_loader)):
