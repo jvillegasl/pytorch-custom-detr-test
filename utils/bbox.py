@@ -45,6 +45,30 @@ def filter_output_by_threshold(outputs: dict[str, Tensor], size, threshold: floa
     return probs_to_keep, bboxes_scaled
 
 
+def get_bbox_patch(rescaled_bbox: Tensor, color):
+    xmin, ymin, xmax, ymax = rescaled_bbox
+
+    patch = patches.Rectangle(
+        (xmin, ymin),
+        xmax-xmin,
+        ymax-ymin,
+        fill=False,
+        linewidth=3,
+        color=color
+    )
+
+    return patch
+
+
+def get_bbox_text(rescaled_bbox: Tensor, cls: str):
+    xmin, ymin, _, _ = rescaled_bbox
+
+    text = plt.text(xmin, ymin, cls, fontsize=15,
+                    bbox=dict(facecolor='yellow', alpha=0.5))
+
+    return text
+
+
 def plot_results(pil_img, prob, boxes, classes):
     plt.figure(figsize=(16, 10))
     plt.imshow(pil_img)
