@@ -19,15 +19,16 @@ def bipartite_matching_loss(output, target):
         'loss_bbox': 5.,
         'loss_giou': 2.,
     }
+
     matcher = HungarianMatcher(cost_class=1, cost_bbox=5, cost_giou=2)
 
     criterion = SetCriterion(
         num_classes=num_classes,
-        weight_dict=weight_dict,
         matcher=matcher
     )
 
-    loss = criterion(output, target)
+    losses = criterion(output, target)
+    loss = sum([weight_dict[k] * losses[k] for k in weight_dict])
 
     return loss
 
@@ -37,7 +38,6 @@ class SetCriterion(nn.Module):
             self,
             num_classes,
             matcher,
-            weight_dict: dict[str, float],
             eos_coef: float = 0.1
     ):
         """
@@ -52,7 +52,6 @@ class SetCriterion(nn.Module):
 
         self.num_classes = num_classes
         self.matcher = matcher
-        self.weight_dict = weight_dict
         self.eos_coef = eos_coef
 
         empty_weight = torch.ones(num_classes + 1)
@@ -256,9 +255,7 @@ class SetCriterion(nn.Module):
         losses.update(self.loss_cardinality(outputs, targets))
         losses.update(self.loss_bboxes(outputs, targets, indices, num_bboxes))
 
-        loss = sum([self.weight_dict[k] * losses[k] for k in self.weight_dict])
-
-        return loss
+        return losses
 
     def _get_src_permutation_idx(self, indices: list[tuple[torch.Tensor, torch.Tensor]]):
         """
