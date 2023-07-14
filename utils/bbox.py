@@ -3,6 +3,7 @@ from torch import Tensor
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import random
+from typing import Any, Optional
 
 
 def box_cxcywh_to_xyxy(x: Tensor):
@@ -60,10 +61,12 @@ def get_bbox_patch(rescaled_bbox: Tensor, color):
     return patch
 
 
-def get_bbox_text(rescaled_bbox: Tensor, cls: str):
+def get_bbox_text(rescaled_bbox: Tensor, cls: str, prob: Optional[Any] = None):
     xmin, ymin, _, _ = rescaled_bbox
 
-    text = plt.text(xmin, ymin, cls, fontsize=15,
+    txt = cls if prob is None else f'{cls}: {prob:0.2f}'
+    
+    text = plt.text(xmin, ymin, txt, fontsize=15,
                     bbox=dict(facecolor='yellow', alpha=0.5))
 
     return text
