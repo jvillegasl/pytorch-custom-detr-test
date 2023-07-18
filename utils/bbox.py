@@ -32,16 +32,16 @@ def rescale_bboxes(out_bbox: Tensor, size):
     return b
 
 
-def filter_output_by_threshold(outputs: dict[str, Tensor], size, threshold: float = 0.7):
+def filter_output_by_threshold(outputs: dict[str, Tensor], size, index, threshold: float = 0.7):
 
     # keep only predictions with confidence above threshold
-    probs = outputs['pred_logits'].softmax(-1)[0, :, :-1]
+    probs = outputs['pred_logits'].softmax(-1)[index, :, :-1]
     keep = probs.max(-1).values > threshold
 
     probs_to_keep = probs[keep]
 
     # convert boxes from [0; 1] to image scales
-    bboxes_scaled = rescale_bboxes(outputs['pred_boxes'][0, keep], size)
+    bboxes_scaled = rescale_bboxes(outputs['pred_boxes'][index, keep], size)
 
     return probs_to_keep, bboxes_scaled
 
@@ -65,7 +65,7 @@ def get_bbox_text(rescaled_bbox: Tensor, cls: str, prob: Optional[Any] = None):
     xmin, ymin, _, _ = rescaled_bbox
 
     txt = cls if prob is None else f'{cls}: {prob:0.2f}'
-    
+
     text = plt.text(xmin, ymin, txt, fontsize=15,
                     bbox=dict(facecolor='yellow', alpha=0.5))
 
