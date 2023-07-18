@@ -3,10 +3,13 @@ from typing import Optional
 import random
 import matplotlib.pyplot as plt
 
-from utils import filter_output_by_threshold, get_bbox_patch, get_bbox_text
+from utils import filter_output_by_threshold, get_bbox_patch, get_bbox_text, nested_tensor_from_tensor_list
 
 
-def show_pred(x: tuple[Tensor, Tensor], y: dict[str, Tensor], classes: list[str], index: Optional[int] = None, threshold: float = 0.7):
+def show_pred(x: tuple[Tensor, Tensor] | Tensor, y: dict[str, Tensor], classes: list[str], index: Optional[int] = None, threshold: float = 0.7):
+    if not isinstance(x, tuple):
+        x = nested_tensor_from_tensor_list(x)
+
     if index is None:
         batch_index = random.randint(0, x[0].size(0)-1)
     else:
@@ -22,7 +25,7 @@ def show_pred(x: tuple[Tensor, Tensor], y: dict[str, Tensor], classes: list[str]
     W = not_mask[:, 0].nonzero()[-1].item() + 1
     size = (H, W)
 
-    probs, bboxes = filter_output_by_threshold(y, size, threshold)
+    probs, bboxes = filter_output_by_threshold(y, size, batch_index, threshold)
 
     colors = []
     for _ in classes:
