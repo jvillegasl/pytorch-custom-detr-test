@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torchvision.models import resnet18, ResNet18_Weights
 import math
 
 
@@ -61,26 +60,3 @@ class PositionEmbeddingSine(nn.Module):
             (pos_y[:, :, :, 0::2].sin(), pos_y[:, :, :, 1::2].cos()), dim=4).flatten(3)
         pos = torch.cat((pos_y, pos_x), dim=3).permute(0, 3, 1, 2)
         return pos
-
-
-class Backbone(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-        self.body = nn.Sequential(
-            *list(resnet18(weights=ResNet18_Weights).children())[:-2]
-        )
-        self.num_channels = 512
-
-    def forward(self, tensor_list: tuple[torch.Tensor, torch.Tensor]):
-        tensors, m = tensor_list
-        assert m is not None
-
-        x = self.body(tensors)
-        mask = F.interpolate(
-            m[None].float(),
-            size=x.shape[-2:]
-        ).to(torch.bool)[0]
-        # m[None] equivalent to unsqueeze(0)
-
-        return x, mask
