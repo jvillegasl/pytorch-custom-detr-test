@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from base import BaseModel
-from model.layers import MLP, Backbone, PositionEmbeddingSine
+from model.layers import MLP, PositionEmbeddingSine
 from model.transformer import Transformer
+from model.backbone import Backbone
 from utils.misc import nested_tensor_from_tensor_list
 
 
@@ -18,9 +19,10 @@ class DETR(BaseModel):
         super().__init__()
 
         self.backbone = Backbone()
-        self.conv = nn.Conv2d(512, self.hidden_dim, 1)
+        self.conv = nn.Conv2d(self.backbone.num_channels, self.hidden_dim, 1)
         self.position_embedding = PositionEmbeddingSine(
-            self.hidden_dim//2, normalize=True
+            self.hidden_dim//2,
+            normalize=True
         )
 
         self.transformer = Transformer(
