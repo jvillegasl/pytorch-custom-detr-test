@@ -53,10 +53,10 @@ def loss_cardinality(output, target):
 def loss_bbox(output, target):
     losses = get_losses(output, target)
 
-    return losses['loss_bbox'].item()
+    return losses['loss_bbox']
 
 
 def loss_giou(output, target):
     losses = get_losses(output, target)
 
-    return losses['loss_giou'].item()
+    return losses['loss_giou']
