@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torchvision.ops import generalized_box_iou
 
 from model.matcher import HungarianMatcher
-from utils.bbox import box_cxcywh_to_xyxy
+from utils import box_cxcywh_to_xyxy, get_world_size
 
 
 def nll_loss(output, target):
@@ -249,6 +249,7 @@ class SetCriterion(nn.Module):
         num_bboxes = sum(len(t["labels"]) for t in targets)
         num_bboxes = torch.as_tensor(
             [num_bboxes], dtype=torch.float, device=next(iter(outputs.values())).device)
+        num_bboxes = torch.clamp(num_bboxes / get_world_size(), min=1).item()
 
         losses = {}
         losses.update(self.loss_labels(outputs, targets, indices))
