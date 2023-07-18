@@ -13,7 +13,7 @@
         "type": "StarsDataLoader",
         "args": {
             "data_dir": "C:/Users/jvill/datasets/simple-object-detection_stars/",
-            "batch_size": 64,
+            "batch_size": 32,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 4
@@ -28,7 +28,7 @@
         }
     },
     "loss": "bipartite_matching_loss",
-    "metrics": [],
+    "metrics": ["loss_labels", "loss_cardinality", "loss_bbox", "loss_giou"],
     "lr_scheduler": {
         "type": "StepLR",
         "args": {
