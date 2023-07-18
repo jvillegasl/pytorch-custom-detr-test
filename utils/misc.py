@@ -1,6 +1,7 @@
 import torch
 import torchvision
 from torch import Tensor, device as Device
+import torch.distributed as dist
 from typing import Optional, List
 
 
@@ -87,3 +88,15 @@ def interpolate(input, size=None, scale_factor=None, mode="nearest", align_corne
     class can go away.
     """
     return torchvision.ops.misc.interpolate(input, size, scale_factor, mode, align_corners)
+
+def is_dist_avail_and_initialized():
+    if not dist.is_available():
+        return False
+    if not dist.is_initialized():
+        return False
+    return True
+
+def get_world_size():
+    if not is_dist_avail_and_initialized():
+        return 1
+    return dist.get_world_size()
