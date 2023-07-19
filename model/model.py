@@ -18,7 +18,7 @@ class DETR(BaseModel):
     def __init__(self, num_classes, num_queries):
         super().__init__()
 
-        self.backbone = Backbone()
+        self.backbone = Backbone(name='resnet18')
         self.conv = nn.Conv2d(self.backbone.num_channels, self.hidden_dim, 1)
         self.position_embedding = PositionEmbeddingSine(
             self.hidden_dim//2,
