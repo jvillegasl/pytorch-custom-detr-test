@@ -26,12 +26,12 @@ class StarsDataLoader(BaseDataLoader):
 
     def __init__(self, data_dir, batch_size, shuffle=True, validation_split=0.0, num_workers=1, training=True):
 
-        trsfm = make_coco_transforms('train' if training else 'val')
+        trsfm = make_coco_transforms('train' if training else 'test')
         self.data_dir = Path(data_dir)
         assert self.data_dir, f'provided COCO path {self.data_dir} does not exist'
 
-        img_folder = self.data_dir / 'images'
-        ann_file = self.data_dir / 'data.json'
+        img_folder = self.data_dir / ('train' if training else 'test')
+        ann_file = self.data_dir / ('train.json' if training else 'test.json')
 
         self.dataset = CocoDetection(
             img_folder, ann_file, transforms=trsfm, return_masks=False)
