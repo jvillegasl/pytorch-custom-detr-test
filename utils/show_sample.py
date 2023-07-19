@@ -18,7 +18,7 @@ def show_sample(xb: tuple[Tensor, Tensor], yb: tuple, classes: list[str], index:
     mask = masks[batch_index]
     data = yb[batch_index]
 
-    label = data['labels'].item()
+    labels = data['labels']
 
     not_mask = ~mask
     H = not_mask[0].nonzero()[-1].item() + 1
@@ -39,7 +39,7 @@ def show_sample(xb: tuple[Tensor, Tensor], yb: tuple, classes: list[str], index:
     _, ax = plt.subplots()
     ax.imshow(image.permute(1, 2, 0))
 
-    for bbox in rescaled_bboxes:
+    for bbox, label in zip(rescaled_bboxes, labels):
         patch = get_bbox_patch(bbox, colors[label])
         ax.add_patch(patch)
 
