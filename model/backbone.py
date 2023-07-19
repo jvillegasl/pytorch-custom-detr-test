@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torchvision.models import resnet50
+import torchvision
 from torchvision.models._utils import IntermediateLayerGetter
 
 
@@ -45,19 +45,20 @@ class FrozenBatchNorm2d(torch.nn.Module):
 
 
 class Backbone(nn.Module):
-    def __init__(self):
+    def __init__(self, name: str):
         super().__init__()
 
-        backbone = resnet50(
+        backbone = getattr(torchvision.models, name)(
             pretrained=True,
             norm_layer=FrozenBatchNorm2d,
-            replace_stride_with_dilation=[False, False, True]
+            replace_stride_with_dilation=[
+                False, False, name not in ('resnet18', 'resnet34')]
         )
 
         self.body = IntermediateLayerGetter(
             backbone, return_layers={'layer4': '0'})
 
-        self.num_channels = 2048
+        self.num_channels = 512 if name in ('resnet18', 'resnet34') else 2048
 
     def forward(self, tensor_list: tuple[torch.Tensor, torch.Tensor]):
         tensors, m = tensor_list
